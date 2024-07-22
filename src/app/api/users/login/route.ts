@@ -10,7 +10,7 @@ export async function POST(res: NextResponse) {
   try {
     const resBody = await res.json();
     const { username, password } = resBody;
-    const validUsername = await User.findOne({ username: "saif" });
+    const validUsername = await User.findOne({ username: username });
     if (!validUsername) {
       return NextResponse.json({
         error: "Invalid .username" + username,
@@ -21,14 +21,18 @@ export async function POST(res: NextResponse) {
       password,
       validUsername.password
     );
-
+    console.log("==============================",password)
     if (checkPassword) {
       const response = NextResponse.json({
         message: "Login successful",
         userId: validUsername._id,
         status: 200,
       });
-      const tokenData = validUsername;
+      const tokenData = {
+        username: validUsername.username,
+        email: validUsername.email,
+        id: validUsername._id,
+      };
       const token = await jwt.sign(tokenData, process.env.TOKEN_SERCET!, {
         expiresIn: "1d",
       });
